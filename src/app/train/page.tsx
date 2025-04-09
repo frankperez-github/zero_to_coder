@@ -13,9 +13,9 @@ export default function SyntaxTrain() {
   const difficulties = Array.from(new Set(questions.map(q => q.difficulty)))
 
   // Estados del formulario
-  const [type, setType] = useState(types[0])
-  const [topic, setTopic] = useState(topics[0])
-  const [difficulty, setDifficulty] = useState(difficulties[0])
+  const [type, setType] = useState<string>(types[0])
+  const [topic, setTopic] = useState<string>(topics[0])
+  const [difficulty, setDifficulty] = useState<string>(difficulties[0])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

@@ -3,16 +3,10 @@
 import { useState, useEffect } from 'react';
 import { questions } from '@/lib/questions';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
-interface Props {
-  params: {
-    type?: string;
-    topic?: string;
-    difficulty?: 'easy' | 'medium' | 'hard';
-  };
-}
 
-const LearnPage = ({ params }: Props) => {
+const LearnPage = () => {
   const [currentDifficulty, setCurrentDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [initialQuestions, setInitialQuestions] = useState(questions.filter(q => q.difficulty === 'easy'));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -20,7 +14,7 @@ const LearnPage = ({ params }: Props) => {
   const [answered, setAnswered] = useState<boolean>(false);
 
   // Get filter params (type, topic, difficulty)
-  const { type, topic, difficulty } = params;
+  const { type, topic, difficulty } = useParams();
 
   // Filter questions based on type, topic, and difficulty params
   let filtered = questions;
