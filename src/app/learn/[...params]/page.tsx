@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { questions } from '@/lib/questions';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 interface Props {
   params: {
-    params: string[];
+    type?: string;
+    topic?: string;
+    difficulty?: 'easy' | 'medium' | 'hard';
   };
 }
 
@@ -19,7 +20,7 @@ const LearnPage = ({ params }: Props) => {
   const [answered, setAnswered] = useState<boolean>(false);
 
   // Get filter params (type, topic, difficulty)
-  const [type, topic, difficulty] = params.params;
+  const { type, topic, difficulty } = params;
 
   // Filter questions based on type, topic, and difficulty params
   let filtered = questions;
