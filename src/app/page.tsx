@@ -1,7 +1,7 @@
 'use client'
 export default function Home() {
   return (
-    <div className="flex flex-col text-gray-600 items-center justify-center min-h-screen bg-gray-100 p-6">
+    <div className="flex flex-col text-gray-600 items-center justify-center min-h-screen bg-gray-100">
       <h1 className="text-4xl font-semibold text-center mb-4">
         Welcome to Zero to Coder!
       </h1>

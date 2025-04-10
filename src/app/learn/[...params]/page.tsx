@@ -13,36 +13,42 @@ const LearnPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answered, setAnswered] = useState<boolean>(false);
 
-  // Get filter params (type, topic, difficulty)
-  const { type, topic, difficulty } = useParams();
+    // Get filter params (type, topic, difficulty)
+    const params = useParams().params!;
 
-  // Filter questions based on type, topic, and difficulty params
-  let filtered = questions;
+    const type = params[0]
+    const topic = params[1]
+    const difficulty = params[2]
 
-  if (type) {
-    filtered = filtered.filter((q) => q.type === type);
-  }
+  
 
-  if (topic) {
-    filtered = filtered.filter((q) => q.topic === topic);
-  }
-
-  if (difficulty) {
-    filtered = filtered.filter((q) => q.difficulty === difficulty);
-  }
-
+  useEffect(()=>{
+    // Filter questions based on type, topic, and difficulty params
+    let questions = initialQuestions
+    if (type) {
+        questions = questions.filter((q) => q.type === type)
+    }
+    
+    if (topic) {
+        questions = questions.filter((q) => q.topic === topic)
+    }
+    
+    if (difficulty) {
+        questions = questions.filter((q) => q.difficulty === difficulty)
+    }
+    setInitialQuestions(questions)
+  }, [type, topic, difficulty])
 
   // Filter the questions based on the current difficulty
-  const easyQuestions = filtered.filter(q => q.difficulty === 'easy');
-  const mediumQuestions = filtered.filter(q => q.difficulty === 'medium');
-  const hardQuestions = filtered.filter(q => q.difficulty === 'hard');
+  const easyQuestions = initialQuestions.filter(q => q.difficulty === 'easy');
+  const mediumQuestions = initialQuestions.filter(q => q.difficulty === 'medium');
+  const hardQuestions = initialQuestions.filter(q => q.difficulty === 'hard');
 
   // Effect to update questions based on difficulty
   useEffect(() => {
     if (difficulty) {
       // If difficulty is provided, use it directly
       setCurrentDifficulty(difficulty as 'easy' | 'medium' | 'hard');
-      setInitialQuestions(filtered);
     } else {
       // Otherwise, set initial questions based on available difficulty levels
       if (easyQuestions.length > 0) {
@@ -56,7 +62,7 @@ const LearnPage = () => {
         setInitialQuestions(hardQuestions);
       }
     }
-  }, [filtered, difficulty]); // Only run when filtered or difficulty changes
+  }, [difficulty]);
 
   const handleAnswerSelected = (answer: string) => {
     setSelectedAnswer(answer);
@@ -129,7 +135,7 @@ const LearnPage = () => {
         <button
           onClick={goToNextQuestion}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
-          disabled={!answered}
+          disabled={!answered && currentQuestion.options.length > 0}
         >
           Next Question
         </button>
@@ -137,8 +143,8 @@ const LearnPage = () => {
 
       <div className="mt-8 text-center">
         <Link
-          href="/learn/resources"
-          className="bg-green-600 hover:bg-green-700 text-white font-bold p-3 rounded-md transition duration-300"
+          href="/resources"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold p-5 rounde-md transition duration-300"
         >
           Explore More Resources
         </Link>

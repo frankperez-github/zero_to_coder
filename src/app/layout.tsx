@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Zero to Coder",
-  description: "Generated using create next app by Frank Perez",
+  description: "Programming learning platform",
 };
 
 export default function RootLayout({

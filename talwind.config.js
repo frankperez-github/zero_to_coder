@@ -6,10 +6,7 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {}
   },
-  plugins: [],
-  corePlugins: {
-    preflight: false, // Disable Preflight completely
-  },
+  plugins: []
 };
