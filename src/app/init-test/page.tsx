@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { questions } from '../../lib/questions';
 import { Question } from '@/lib/questions';
-import Link from 'next/link';
 import QuestionComp from '@/components/Question';
 
 const ResultsPage = ({ logicScore, syntaxScore }: { logicScore: number; syntaxScore: number }) => {
@@ -34,7 +33,7 @@ const ResultsPage = ({ logicScore, syntaxScore }: { logicScore: number; syntaxSc
   };
 
   return (
-    <div className="container min-h-[100vh] p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
+    <div className="min-h-[100vh] p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
       <h1 className="text-3xl font-bold text-center mb-6">Test Results</h1>
       
       <div className="mb-4">
@@ -49,19 +48,19 @@ const ResultsPage = ({ logicScore, syntaxScore }: { logicScore: number; syntaxSc
         <p>{getSuggestedNextSteps(syntaxScore, syntaxQuestionsCount, 'Syntax')}</p>
       </div>
 
-      <div className="mt-6 text-center">
-        <Link
-          href="/learn/logic"
-          className="bg-green-600 hover:bg-green-700 text-white font-bold p-3 rounded-md w-full transition duration-300 mb-3"
+      <div className="mt-6 gap-10 flex text-center">
+        <button
+          onClick={()=>location.href = `/learn/logic/${logicScore < 5 ? 'operations' : 'sequences'}/${logicScore < 3 ? 'easy' : logicScore < 5 ? 'medium' : 'hard'}`}
+          className="bg-green-600 hover:bg-green-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
         >
           Start Logic Practice
-        </Link>
-        <Link
-          href="/learn/syntax"
+        </button>
+        <button
+          onClick={()=>location.href = `/learn/syntax/lists/${syntaxScore < 3 ? 'easy' : syntaxScore < 5 ? 'medium' : 'hard'}`}
           className="bg-green-600 hover:bg-green-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
         >
           Start Syntax Practice
-        </Link>
+        </button>
       </div>
     </div>
   );
@@ -117,41 +116,28 @@ const InitTest = () => {
   };
 
   return (
-    <div className="container min-h-[100vh] overflow-auto p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
+    <div className="min-h-[100vh] overflow-auto p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
       <h1 className="text-3xl font-bold text-center mb-6">Initial Test:</h1>
       {!finished ? (
         <div>
           <QuestionComp
             key={questions[currentIndex].id}
             question={questions[currentIndex]}
-            onAnswerSelected={handleAnswerSelected}
             questionIndex={currentIndex}
-            selectedAnswer={answers[questions[currentIndex].id]}
+            goToNextQuestion={goToNextQuestion}
+            onAnswerSelected={handleAnswerSelected}
+            goToPreviousQuestion={goToPreviousQuestion}
           />
           
-          <div className="flex justify-between mt-4">
-            <button
-              onClick={goToPreviousQuestion}
-              className="bg-gray-600 hover:bg-gray-700 text-white font-bold p-2 rounded-md"
-              disabled={currentIndex === 0}
-            >
-              Back
-            </button>
+          <div className="flex justify-end mt-10">
             <div className="text-center">
               <button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-md w-full mt-4 transition duration-300"
+                className="bg-blue-600 hover:bg-blue-700 px-10 text-white font-bold p-2 rounded-md w-full mt-4 transition duration-300"
                 onClick={handleSubmit}
               >
-                Finish Here
+                Finish Test
               </button>
             </div>
-            <button
-              onClick={goToNextQuestion}
-              className="bg-gray-600 hover:bg-gray-700 text-white font-bold p-2 rounded-md"
-              disabled={currentIndex === questions.length - 1}
-            >
-              Next
-            </button>
           </div>
         </div>
       ) : (

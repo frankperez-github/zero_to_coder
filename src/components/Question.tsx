@@ -1,60 +1,108 @@
-'use client'
-import { useState } from 'react';
-import { Question } from '../lib/questions';
+"use client";
+import { useState } from "react";
+import { Question } from "../lib/questions";
 
 interface QuestionProps {
   question: Question;
-  onAnswerSelected: (answer: string, questionId: number) => void;
   questionIndex: number;
-  selectedAnswer: string | null; // Receives selectedAnswer from parent
+  goToNextQuestion: () => void;
+  goToPreviousQuestion: () => void;
+  onAnswerSelected?: (answer: string, questionId: number) => void;
 }
 
 const QuestionComp: React.FC<QuestionProps> = ({
-  question,
-  onAnswerSelected,
-  questionIndex,
+    question: currentQuestion,
+    questionIndex: currentQuestionIndex,
+    goToNextQuestion,
+    onAnswerSelected,
+    goToPreviousQuestion
 }) => {
-  const [showHint, setShowHint] = useState(false);
+    const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [answered, setAnswered] = useState<boolean>(false);
 
-  const handleAnswerSelect = (answer: string) => {
-    onAnswerSelected(answer, question.id);  
-  };
+    const handleAnswerSelected = (answer: string) => {
+        setSelectedAnswer(answer);
+        setAnswered(true);
+        if(onAnswerSelected)
+        {
+            onAnswerSelected(answer, currentQuestionIndex);
+        }
+    };
 
-  const toggleHint = () => {
-    setShowHint(!showHint);
-  };
+    const handlePreviousQuestion = () => {
+        setAnswered(false);
+        setSelectedAnswer(null);
+        goToPreviousQuestion();
+    }
 
+    const handleNextQuestion = () => {
+        setAnswered(false);
+        setSelectedAnswer(null);
+        goToNextQuestion();
+    };
 
-  return (
-    <div className="mb-6 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl">
-      <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
-        Question {questionIndex + 1}
-      </h3>
-      <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">{question.question}</p>
-      
-      {/* Answer options */}
-      <div className="flex flex-col space-y-3">
-        {question.options.map((option) => (
-          <button
-            key={option}
-            className={`p-3 rounded-md border-2 transition-all duration-300 ease-in-out hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 `}
-            onClick={() => handleAnswerSelect(option)}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
+    return (
+        <div className="">
+            <div className="mb-4">
+                <h2 className="text-2xl font-semibold">
+                Question {currentQuestionIndex + 1}:
+                </h2>
+                <p className="text-lg">{currentQuestion.question}</p>
+            </div>
 
-      {/* Show hint */}
-      <button
-        onClick={toggleHint}
-        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md transition-all duration-200"
-      >
-        {showHint ? 'Hide Hint' : 'Show Hint'}
-      </button>
-      {showHint && <p className="mt-3 text-sm text-gray-700 dark:text-gray-400">{question.hint}</p>}
-    </div>
-  );
+            <div className="mb-6 grid grid-cols-4 gap-10">
+                {currentQuestion.options.map((option, index) => (
+                <button
+                    key={index}
+                    onClick={() => handleAnswerSelected(option)}
+                    className={`w-full p-3 mb-2 rounded-md text-lg font-semibold ${
+                    selectedAnswer === option
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-300 hover:bg-gray-400 text-gray-800"
+                    }`}
+                >
+                    {option}
+                </button>
+                ))}
+            </div>
+
+            {answered && (
+                <div className="mb-4">
+                {selectedAnswer === currentQuestion.correctAnswer ? (
+                    <p className="text-green-600">Correct! Well done.</p>
+                ) : (
+                    <p className="text-red-600">
+                    Incorrect. The correct answer is: {currentQuestion.correctAnswer}
+                    </p>
+                )}
+                <div className="mt-4">
+                    <p className="text-sm text-white">{currentQuestion.explanation}</p>
+                </div>
+                </div>
+            )}
+
+            <div className="flex justify-evenly">
+                <div className="flex justify-between w-1/4 mx-auto mt-20">
+                    <button
+                    onClick={handlePreviousQuestion}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
+                    disabled={currentQuestion.options.length == 0}
+                    >
+                    Previous Question
+                    </button>
+                </div>
+                <div className="flex justify-between w-1/4 mx-auto mt-20">
+                    <button
+                    onClick={handleNextQuestion}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
+                    disabled={!answered && currentQuestion.options.length > 0}
+                    >
+                    Next Question
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default QuestionComp;

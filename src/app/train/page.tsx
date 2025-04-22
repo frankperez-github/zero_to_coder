@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {questions} from '../../lib/questions'
 
 export default function SyntaxTrain() {
@@ -9,8 +9,8 @@ export default function SyntaxTrain() {
 
   // Obtener opciones únicas de type, topic y difficulty
   const types = Array.from(new Set(questions.map(q => q.type)))
-  const topics = Array.from(new Set(questions.map(q => q.topic)))
-  const difficulties = Array.from(new Set(questions.map(q => q.difficulty)))
+  const [topics, setTopics] = useState(Array.from(new Set(questions.map(q => q.topic))))
+  const [difficulties, setDifficulties] = useState(Array.from(new Set(questions.map(q => q.difficulty))))
 
   // Estados del formulario
   const [type, setType] = useState<string>(types[0])
@@ -22,9 +22,17 @@ export default function SyntaxTrain() {
     router.push(`/learn/${type}/${topic}/${difficulty}`)
   }
 
+  useEffect(()=>{
+    setTopics(Array.from(new Set(questions.filter(q => q.type === type).map(q => q.topic))))
+  },[type])
+
+  useEffect(()=>{
+    setDifficulties(Array.from(new Set(questions.filter(q => q.type === type && q.topic === topic).map(q => q.difficulty))))
+  },[topic])
+
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 bg-gray-800 rounded-xl shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-center">Comenzar Entrenamiento</h2>
+    <div className="max-w-md mx-auto mt-10 p-4 bg-gray-100 border-2 border-gray-600 rounded-xl shadow-md">
+      <h2 className="text-xl font-bold mb-4 text-center">Start training</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col">
           Tipo:
