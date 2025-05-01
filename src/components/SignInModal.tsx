@@ -10,6 +10,7 @@ export default function SignInModal({ showModal, setShowModal }:{ showModal: "" 
       const response = await API.post('/users/login', data);
       localStorage.setItem("token",response.data.token);
       setShowModal("");
+      location.href = '/profile'
     } catch (error) {
       console.error(error);
     }

@@ -11,7 +11,7 @@ export default function Profile()
             window.location.href = "/";
             return
         }
-        API.get("/users/", {
+        API.get("/users/me", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -36,8 +36,6 @@ export default function Profile()
                         <h2 className="text-2xl font-semibold mb-4">User Information</h2>
                         <p><strong>Name:</strong> {user.name}</p>
                         <p><strong>Email:</strong> {user.email}</p>
-                        <p><strong>Sintax Level at initial test:</strong> {user.sintax_level}</p>
-                        <p><strong>Logic Level at initial test:</strong> {user.logic_level}</p>
                     </div>
                 ) : 
                     <p>Loading...</p>
@@ -54,7 +52,13 @@ export default function Profile()
                     onClick={() => window.location.href = '/train'}
                     className="bg-blue-500 text-white p-3 rounded-md text-xl font-semibold transition-all hover:bg-blue-600 mt-6"
                 >
-                    Train
+                    Follow my own path
+                </button>
+                <button
+                    onClick={() => window.location.href = '/learn'}
+                    className="bg-blue-500 text-white p-3 rounded-md text-xl font-semibold transition-all hover:bg-blue-600 mt-6"
+                >
+                    Continue learning
                 </button>
             </div>
         </div>

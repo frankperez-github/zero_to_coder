@@ -1,6 +1,6 @@
 "use client";
+import Question from "@/types/Question";
 import { useState } from "react";
-import { Question } from "../lib/questions";
 
 interface QuestionProps {
   question: Question;
@@ -47,11 +47,11 @@ const QuestionComp: React.FC<QuestionProps> = ({
                 <h2 className="text-2xl font-semibold">
                 Question {currentQuestionIndex + 1}:
                 </h2>
-                <p className="text-lg">{currentQuestion.question}</p>
+                <p className="text-lg">{currentQuestion?.text}</p>
             </div>
 
             <div className="mb-6 grid grid-cols-4 gap-10">
-                {currentQuestion.options.map((option, index) => (
+                {currentQuestion?.options.map((option, index) => (
                 <button
                     key={index}
                     onClick={() => handleAnswerSelected(option)}
@@ -68,36 +68,40 @@ const QuestionComp: React.FC<QuestionProps> = ({
 
             {answered && (
                 <div className="mb-4">
-                {selectedAnswer === currentQuestion.correctAnswer ? (
+                {selectedAnswer === currentQuestion?.answer ? (
                     <p className="text-green-600">Correct! Well done.</p>
                 ) : (
                     <p className="text-red-600">
-                    Incorrect. The correct answer is: {currentQuestion.correctAnswer}
+                    Incorrect. The correct answer is: {currentQuestion?.answer}
                     </p>
                 )}
                 <div className="mt-4">
-                    <p className="text-sm text-white">{currentQuestion.explanation}</p>
+                    <p className="text-sm text-white">{currentQuestion?.explanation}</p>
                 </div>
                 </div>
             )}
 
             <div className="flex justify-evenly">
-                <div className="flex justify-between w-1/4 mx-auto mt-20">
-                    <button
-                    onClick={handlePreviousQuestion}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
-                    disabled={currentQuestion.options.length == 0}
-                    >
-                    Previous Question
-                    </button>
-                </div>
+                {
+                    currentQuestionIndex > 0 && (
+                        <div className="flex justify-between w-1/4 mx-auto mt-20">
+                            <button
+                                onClick={handlePreviousQuestion}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
+                            >
+                                Previous Question
+                            </button>
+                        </div>
+                    )
+                }
+                
                 <div className="flex justify-between w-1/4 mx-auto mt-20">
                     <button
                     onClick={handleNextQuestion}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
-                    disabled={!answered && currentQuestion.options.length > 0}
+                    disabled={!answered && currentQuestion?.options.length > 0}
                     >
-                    Next Question
+                        Next Question
                     </button>
                 </div>
             </div>
