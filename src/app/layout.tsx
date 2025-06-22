@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
+import { Layout } from "@/components/Layout";
 
 export const metadata: Metadata = {
   title: "Zero to Coder",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
         <body>
-            <ToastContainer/>
-            {children}
+            <Layout>
+              <ToastContainer/>
+              {children}
+            </Layout>
         </body>
     </html>
   );

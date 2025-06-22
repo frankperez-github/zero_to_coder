@@ -1,63 +1,40 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import QuestionComp from '@/components/Question';
 import API from '@/api';
 import Question from '@/types/Question';
-import { toast } from 'react-toastify';
+import { TypeAnimation } from 'react-type-animation';
+import ConfettiOnLoad from '@/components/ConffetiOnLoad';
 
 
 const LearnPage = () => {
-    const [initialQuestions, setQuestions] = useState<Question[]>([]);
+
     const [currentQuestion, setCurrentQuestion] = useState<Question>();
-    const [loading, setLoading] = useState(true)
+    const [questions, setQuestions] = useState<Question[]>([]);
+    const [noQuestions, setNoQuestions] = useState(false)
 
     useEffect(()=>{
-        API.get("/questions", {
+        API.get("/questions/start", {
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
             }
         }).then((data)=>{
-            setQuestions(data.data)
+            if (data.data.length == 0)
+                setNoQuestions(true)
+            setQuestions([data.data[0]])
+            setCurrentQuestion(data.data[0])
         })
     },[])
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-    // Get filter params (topic, difficulty)
-    const params = useParams().params!;
-
-    const topic = params[0]
-    const difficulty = params[1]
-
-
-    useEffect(()=>{
-        // Filter questions based on topic, and difficulty params
-        if (initialQuestions.length > 0 && loading)
-        {
-            let questions = initialQuestions
-            
-            if (topic) {
-                questions = questions.filter((q) => q.topics.includes(topic))
-            }
-            
-            if (difficulty) {
-                questions = questions.filter((q) => q.difficulty === difficulty)
-            }
-            setQuestions([questions[0]])
-            setLoading(false)
-            setCurrentQuestion(questions[0])
-        }
-    }, [initialQuestions])
-  
-
-    const goToNextQuestion = () => {
-        if (currentQuestionIndex < initialQuestions.length - 1) {
+    const goToNextQuestion = (time:string) => {
+        if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
-            API.get("/questions/"+currentQuestion?.id+"/next", {
+            API.post("/questions/"+currentQuestion?.id+"/next", { time },
+            {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -72,7 +49,7 @@ const LearnPage = () => {
                     }).then((data)=>{
                         if(data.data.length == 0)
                         {
-                            toast.success("You have completed all the questions!")
+                            setNoQuestions(true)
                             return
                         }
                         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -86,53 +63,74 @@ const LearnPage = () => {
                 }
             })
         }
-        API.put("/questions/"+currentQuestion?.id+"/done", {}, {
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
-            }
-        })
     };
 
     useEffect(() => {
-        setCurrentQuestion(initialQuestions[currentQuestionIndex])
+        setCurrentQuestion(questions[currentQuestionIndex])
     }, [currentQuestionIndex]);
 
     const goToPreviousQuestion = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(currentQuestionIndex - 1);
-            setCurrentQuestion(initialQuestions[currentQuestionIndex - 1]);
+            setCurrentQuestion(questions[currentQuestionIndex - 1]);
         }
     }
 
 
     return (
-        <div className="min-h-[100vh] p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
-            <h1 className="text-3xl font-bold text-center mb-6">Learn Page</h1>
-            <p className="text-xl mb-16 text-center">
-                In this section, you can practice and improve your skills. Answer the following questions and get immediate feedback.
-            </p>
+        <div className="p-4 w-full px-20 text-gray-800">
             {
-                currentQuestion ? 
-                    <QuestionComp 
-                        question={currentQuestion} 
-                        questionIndex={currentQuestionIndex} 
-                        goToNextQuestion={goToNextQuestion}
-                        goToPreviousQuestion={goToPreviousQuestion}
-                    />
-                :
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-semibold mb-4">Loading questions...</h2>
+                noQuestions ?
+                    <div className="">
+                        <ConfettiOnLoad />
+                        <TypeAnimation
+                            sequence={[
+                            'Felicidades! has completado tu camino, ya puedes salir al mundo real buscando nuevos retos que resolver usando tus conocimientos de programación, buena suerte.',
+                            10000,
+                            'Gracias por usar Zero to Coder, tú también puedes ser parte de nuestro equipo, contáctanos a través del fp848584@gmail.com'
+                            ]}
+                            speed={{
+                                    type: "keyStrokeDelayInMs", 
+                                    value: 20
+                                }}
+                            wrapper="span"
+                            cursor={true}
+                            repeat={0}
+                            style={{ fontSize: '2em', display: 'inline-block' }}
+                        />
+                    </div>
+            :
+                <div className="">
+
+                    <TypeAnimation
+                            sequence={[
+                            'En esta sección puedes mejorar tus habilidades. Responde los ejercicios y obtendrás retroalimentación inmediatamente.'
+                            ]}
+                            speed={{
+                                    type: "keyStrokeDelayInMs", 
+                                    value: 20
+                                }}
+                            wrapper="span"
+                            cursor={true}
+                            repeat={0}
+                            style={{ fontSize: '1em', display: 'inline-block' }}
+                        />
+                    {
+                        currentQuestion ? 
+                            <QuestionComp 
+                                question={questions[currentQuestionIndex]} 
+                                questionIndex={currentQuestionIndex} 
+                                goToNextQuestion={goToNextQuestion}
+                                goToPreviousQuestion={goToPreviousQuestion}
+                            />
+                        :
+                            <div className="text-center">
+                                <p className="text-lg">Cargando preguntas...</p>
+                            </div>
+                    }
                 </div>
             }
 
-            <div className="absolute bottom-8 text-center">
-                <Link
-                href="/resources"
-                className="bg-green-600 hover:bg-green-700 text-white font-bold p-5 rounde-md transition duration-300"
-                >
-                Explore More Resources
-                </Link>
-            </div>
         </div>
     );
 };

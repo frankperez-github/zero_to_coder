@@ -1,110 +1,145 @@
 'use client'
+import API from "@/api";
+import ConfettiOnLoad from "@/components/ConffetiOnLoad";
+import QuestionComp from "@/components/Question";
+import Question from "@/types/Question";
+import { useEffect, useState } from "react";
+import { TypeAnimation } from "react-type-animation";
 
-/* const ResultsPage = ({ logicScore, sintaxScore }: { logicScore: number; sintaxScore: number }) => {
+export default function InitTest (){
+    const [showQuestions, setShowQuestions] = useState(false)
+    const [testQuestions, setTestQuestions] = useState<Question[]>([])
+    const [currentQuestion, setCurrentQuestion] = useState<Question>()
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+    const [finished, setFinished] = useState(false)
 
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const [noQuestions, setNoQuestions] = useState(false)
+
     useEffect(()=>{
-        API.get('/questions', {
+        API.get("/questions/start", {
             headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             }
-        }).then((res) => {
-            const data = res.data;
-            setQuestions(data);
+        }).then((data)=>{
+            setTestQuestions([data.data[0]])
+            setCurrentQuestion(data.data[0])
         })
     },[])
 
-
-    return (
-        <div className="min-h-[100vh] p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
-            <h1 className="text-3xl font-bold text-center mb-6">Test Results</h1>
-
-            <div className="mt-6 gap-10 flex text-center">
-                <button
-                onClick={()=>location.href = `/learn/logic/${logicScore < 5 ? 'operations' : 'sequences'}/${logicScore < 3 ? 'easy' : logicScore < 5 ? 'medium' : 'hard'}`}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
-                >
-                    Start Logic Practice
-                </button>
-                <button
-                onClick={()=>location.href = `/learn/sintax/lists/${sintaxScore < 3 ? 'easy' : sintaxScore < 5 ? 'medium' : 'hard'}`}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold p-3 rounded-md w-full transition duration-300"
-                >
-                    Start Sintax Practice
-                </button>
-            </div>
-        </div>
-    );
-}; */
-
-const InitTest = () => {
-    /* const [answers, setAnswers] = useState<Record<string, string>>({});
-    const [finished, setFinished] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const goToNextQuestion = (time:string) => {
+            if (currentQuestionIndex < testQuestions.length - 1) {
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+            } else {
+                API.post("/questions/"+currentQuestion?.id+"/next", { time }, {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                })
+                .then((data)=>{
+                    if (data.data.length == 0)
+                    {
+                        API.get(`/questions/${currentQuestion?.id}/next-topics`, {
+                            headers:{
+                                "Authorization": `Bearer ${localStorage.getItem("token")}`
+                            }
+                        }).then((data)=>{
+                            if(data.data.length == 0)
+                            {
+                                setNoQuestions(true)
+                                return
+                            }
+                            setCurrentQuestionIndex(currentQuestionIndex + 1);
+                            setTestQuestions(previousQuestions => [...previousQuestions, ...data.data])
+                        })
+                    }
+                    else
+                    {
+                        setCurrentQuestionIndex(currentQuestionIndex + 1);
+                        setTestQuestions(previousQuestions => [...previousQuestions, ...data.data])
+                    }
+                })
+            }
+    };
     
-    useEffect(()=>{
-        API.get('/questions', {
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
-            }
-        }).then((res) => {
-            const data = res.data;
-            setQuestions(data);
-        })
-    },[])
-
-    const handleAnswerSelected = (answer: string, questionId: number) => {
-        setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [questionId]: answer,
-        }));
-    };
-
-    const goToNextQuestion = () => {
-        if (currentIndex < questions.length - 1) {
-            setCurrentIndex(currentIndex + 1);
-        }
-    };
+    useEffect(() => {
+        setCurrentQuestion(testQuestions[currentQuestionIndex])
+    }, [currentQuestionIndex]);
 
     const goToPreviousQuestion = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(currentQuestionIndex - 1);
+            setCurrentQuestion(testQuestions[currentQuestionIndex - 1]);
         }
-    };
+    }
 
-    return (
-        <div className="min-h-[100vh] overflow-auto p-4 w-full px-20 bg-neutral-50 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
-            <h1 className="text-3xl font-bold text-center mb-6">Initial Test:</h1>
-            {!finished && (
-                <div>
-                <QuestionComp
-                    key={questions[currentIndex]?.id}
-                    question={questions[currentIndex]}
-                    questionIndex={currentIndex}
-                    goToNextQuestion={goToNextQuestion}
-                    onAnswerSelected={handleAnswerSelected}
-                    goToPreviousQuestion={goToPreviousQuestion}
-                />
-                
-                <div className="flex justify-end mt-10">
-                    <div className="text-center">
-                    <button
-                        className="bg-blue-600 hover:bg-blue-700 px-10 text-white font-bold p-2 rounded-md w-full mt-4 transition duration-300"
-                        onClick={()=>{}}
-                    >
-                        Finish Test
-                    </button>
-                    </div>
-                </div>
-                </div>
-            )}
-        </div>
-    ); */
     return(
-        <div className=""></div>
+        <div className="text-gray-600">
+            <div className="flex justify-between gap-10 mb-12">
+                {
+                    noQuestions ?
+                        <div className="">
+                            <ConfettiOnLoad />
+                            <TypeAnimation
+                                sequence={[
+                                'Felicidades! Ya dominas todos los temas básicos de programación, ya puedes salir al mundo real buscando nuevos retos que resolver usando tus conocimientos de programación, buena suerte.',
+                                10000,
+                                'Gracias por usar Zero to Coder, tú también puedes ser parte de nuestro equipo, contáctanos a través del fp848584@gmail.com'
+                                ]}
+                                speed={{
+                                        type: "keyStrokeDelayInMs", 
+                                        value: 20
+                                    }}
+                                wrapper="span"
+                                cursor={true}
+                                repeat={0}
+                                style={{ fontSize: '2em', display: 'inline-block' }}
+                            />
+                        </div>
+                    :
+                    !finished ?
+                        <TypeAnimation
+                            sequence={[
+                                'Vamos a averiguar lo que sabes.',
+                                2000,
+                                'Completa todos los ejercicios que puedas, puedes usar las pistas si te son de ayuda.',
+                                3000,
+                                'Si no sabes responder a este ejercicio, presiona Finalizar exámen, así sabremos por donde empezar tu recorrido.',
+                                200,
+                                ()=>setShowQuestions(true)
+                            ]}
+                            speed={{
+                                    type: "keyStrokeDelayInMs", 
+                                    value: 20
+                                }}
+                            wrapper="span"
+                            cursor={true}
+                            repeat={0}
+                            style={{ fontSize: '1em', display: 'inline-block' }}
+                        />
+                    :
+                        <h2 className="text-xl">Exámen finalizado, ya estamos listos para comenzar tu camino hacia programador! <span className="text-blue-500 border-b-2 cursor-pointer" onClick={()=>location.href = "/learn"}>Comenzar</span></h2>
+                }
+                {
+                    showQuestions && !finished &&
+                        <button
+                            onClick={()=>setFinished(true)}
+                            className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-md w-1/4 transition duration-300"
+                        >
+                            Finalizar exámen ✅
+                        </button>
+                }
+            </div>
+            {
+                !finished && showQuestions && currentQuestion &&
+                    <div className="">
+                        <QuestionComp 
+                            question={currentQuestion} 
+                            questionIndex={0} 
+                            goToNextQuestion={goToNextQuestion} 
+                            goToPreviousQuestion={goToPreviousQuestion} 
+                        />
+                    </div>
+            }
+        </div>
     )
-};
-
-export default InitTest;
+}

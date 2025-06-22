@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+@keyframes grow-line {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+  
+  @keyframes grow-line-vertical {
+    from {
+      height: 0%;
+    }
+    to {
+      height: 100%;
+    }
+  }
+  
+  .animate-grow-line {
+    animation: grow-line 1.5s ease-out forwards infinite;
+  }
+  
+  .animate-grow-line-vertical {
+    animation: grow-line-vertical 1.5s ease-out forwards infinite;
+  }
+
+;

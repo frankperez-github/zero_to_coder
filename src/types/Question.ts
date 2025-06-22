@@ -6,6 +6,7 @@ interface Question {
     topics: string[];
     text: string;
     options: string[];
+    solutionSignature: string,
     answer: string;
     hint: string;
     explanation: string;

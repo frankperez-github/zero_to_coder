@@ -43,22 +43,23 @@ export default function SyntaxTrain() {
   },[topic])
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 bg-gray-100 border-2 border-gray-600 rounded-xl shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-center">Start training</h2>
+    <div className="max-w-md text-gray-600 mx-auto mt-10 p-4 border-2 border-gray-600 rounded-xl shadow-md">
+      <h2 className="text-xl font-bold mb-4 text-center">Comenzar entrenamiento</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col">
           Tema:
-          <select
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            className="border p-2 rounded"
-          >
-            {topics.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+            <select
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                className="border p-2 rounded"
+            >
+                <option value="" disabled/>
+                {topics.map((t) => (
+                <option key={t} value={t}>
+                    {t}
+                </option>
+                ))}
+            </select>
         </label>
 
         <label className="flex flex-col">
